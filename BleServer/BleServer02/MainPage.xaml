@@ -1,0 +1,43 @@
+﻿<Page
+    x:Class="BleServer02.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:BleServer02"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0"
+                    Orientation="Horizontal">
+            <Button Content="Start Gatt server"
+                    Margin="3"
+                    x:Name="StartGattServerButton"
+                    Click="StartGattServer_Click" />
+            <Button Content="Stop Gatt server"
+                    Margin="3"
+                    x:Name="StopServerButton"
+                    Click="StopGattServer_Click" />
+        </StackPanel>
+        <StackPanel Grid.Row="1"
+                    Orientation="Horizontal">
+
+            <TextBox x:Name="txtData" Width="500"/>
+            <Button x:Name="btnSendData" Content="Отрпавить" Click="btnSendData_Click"/>
+        </StackPanel>
+        <TextBlock Margin="3"
+                   Grid.Row="3" />
+        <ScrollViewer Grid.Row="2">
+            <TextBlock x:Name="LogTextBox"
+                       Margin="3"
+                       TextWrapping="Wrap" />
+        </ScrollViewer>
+    </Grid>
+</Page>
