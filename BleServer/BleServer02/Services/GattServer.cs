@@ -20,6 +20,8 @@ namespace BleServer02.Services
         public delegate void GattChararteristicHandler(object myObject, CharacteristicEventArgs myArgs);
 
         public event GattChararteristicHandler OnCharacteristicWrite;
+        private static int DELAY_MS = 60;
+        private static int BLOCK_SIZE = 160;
 
         public GattServer(Guid serviceId, ILogger logger)
         {
@@ -93,6 +95,9 @@ namespace BleServer02.Services
                         return;
                     }
 
+                    //задержка чтения блоков
+                    await Task.Delay(DELAY_MS);
+
                     using (var dataReader = DataReader.FromBuffer(request.Value))
                     {
                         var characteristicValue = dataReader.ReadString(request.Value.Length);
@@ -138,27 +143,30 @@ namespace BleServer02.Services
         {
             if (_characteristics.TryGetValue(characteristicId, out var characteristic))
             {
-                var writer = new DataWriter();
-                writer.WriteBytes(data);
-                var buffer = writer.DetachBuffer();
-
-                var notificationResults = await characteristic.NotifyValueAsync(buffer);
-
-                // Проверяем каждый результат уведомления
+                //Разбиение на блоки
+                var blocks = SplitDataIntoBlocks(data, BLOCK_SIZE);
                 bool success = true;
-                foreach (var result in notificationResults)
+                foreach (var block in blocks)
                 {
-                    if (result.Status != GattCommunicationStatus.Success)
-                    {
-                        success = false;
-                        await _logger.LogMessageAsync($"Failed to send data: {result.Status}");
-                    }
-                }
+                    var writer = new DataWriter();
+                    writer.WriteBytes(block);
+                    var buffer = writer.DetachBuffer();
 
-                if (success)
-                {
-                    //await _logger.LogMessageAsync("Data successfully sent to client.");
+                    var notificationResults = await characteristic.NotifyValueAsync(buffer);
+
+                    foreach (var result in notificationResults)
+                    {
+                        if (result.Status != GattCommunicationStatus.Success)
+                        {
+                            success = false;
+                            await _logger.LogMessageAsync($"Ошибка отправки данных: {result.Status}");
+                        }
+                    }
+
+                    // Задержка между отправками блоков
+                    await Task.Delay(DELAY_MS);
                 }
+                
                 return success;
             }
             else
@@ -166,6 +174,25 @@ namespace BleServer02.Services
                 await _logger.LogMessageAsync("Characteristic not found.");
                 return false;
             }
+        }
+
+        private static List<byte[]> SplitDataIntoBlocks(byte[] data, int blockSize)
+        {
+            var blocks = new List<byte[]>();
+
+            int totalLength = data.Length;
+            int offset = 0;
+
+            while (offset < totalLength)
+            {
+                int length = Math.Min(blockSize, totalLength - offset);
+                byte[] block = new byte[length];
+                Array.Copy(data, offset, block, 0, length);
+                blocks.Add(block);
+                offset += length;
+            }
+
+            return blocks;
         }
 
 

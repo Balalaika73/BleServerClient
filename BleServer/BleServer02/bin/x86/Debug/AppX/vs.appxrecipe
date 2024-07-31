@@ -10,7 +10,7 @@
     <PackageArchitecture>x86</PackageArchitecture>
     <PackageIdentityName>e2854362-6d32-4dcd-8247-594f63ef34eb</PackageIdentityName>
     <PackageIdentityPublisher>CN=Telepuzik</PackageIdentityPublisher>
-    <IntermediateOutputPath>C:\Users\Telepuzik\source\repos\BleServer02\BleServer02\obj\x86\Debug\</IntermediateOutputPath>
+    <IntermediateOutputPath>C:\Users\Telepuzik\source\repos\BleServer02\BleServer\BleServer02\obj\x86\Debug\</IntermediateOutputPath>
     <RemoteDeploymentType>
     </RemoteDeploymentType>
     <PackageRegistrationPath>
@@ -18,7 +18,7 @@
     <RemoveNonLayoutFiles>true</RemoveNonLayoutFiles>
     <DeployOptionalPackages>false</DeployOptionalPackages>
     <WindowsSdkPath>C:\Program Files %28x86%29\Windows Kits\10\</WindowsSdkPath>
-    <LayoutDir>C:\Users\Telepuzik\source\repos\BleServer02\BleServer02\bin\x86\Debug\AppX</LayoutDir>
+    <LayoutDir>C:\Users\Telepuzik\source\repos\BleServer02\BleServer\BleServer02\bin\x86\Debug\AppX</LayoutDir>
     <RegisteredManifestChecksum>4A0ABF925192FD5DF54D35E98354014C5D7EF466853D16B68B52B67892E58425</RegisteredManifestChecksum>
     <RegisteredPackageMoniker>e2854362-6d32-4dcd-8247-594f63ef34eb_1.0.0.0_x86__x4wk4n7dnfqt0</RegisteredPackageMoniker>
     <RegisteredUserModeAppID>e2854362-6d32-4dcd-8247-594f63ef34eb_x4wk4n7dnfqt0!App</RegisteredUserModeAppID>
@@ -27,16 +27,16 @@
     <RegisteredVersion>1.0.0.0</RegisteredVersion>
   </PropertyGroup>
   <ItemGroup>
-    <AppXManifest Include="C:\Users\Telepuzik\source\repos\BleServer02\BleServer02\bin\x86\Debug\Core\AppxManifest.xml">
+    <AppXManifest Include="C:\Users\Telepuzik\source\repos\BleServer02\BleServer\BleServer02\bin\x86\Debug\Core\AppxManifest.xml">
       <PackagePath>AppxManifest.xml</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2024-07-29T14:28:12.319</Modified>
+      <Modified>2024-07-31T15:58:23.025</Modified>
     </AppXManifest>
   </ItemGroup>
   <ItemGroup>
-    <AppxPackagedFile Include="C:\Users\Telepuzik\source\repos\BleServer02\BleServer02\bin\x86\Debug\BleServer02.exe">
+    <AppxPackagedFile Include="C:\Users\Telepuzik\source\repos\BleServer02\BleServer\BleServer02\bin\x86\Debug\BleServer02.exe">
       <PackagePath>entrypoint\BleServer02.exe</PackagePath>
-      <Modified>2024-07-29T14:28:10.830</Modified>
+      <Modified>2024-07-31T15:58:21.577</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\Telepuzik\.nuget\packages\microsoft.bcl.asyncinterfaces\8.0.0\lib\netstandard2.0\Microsoft.Bcl.AsyncInterfaces.dll">
       <PackagePath>Microsoft.Bcl.AsyncInterfaces.dll</PackagePath>
@@ -62,67 +62,67 @@
       <PackagePath>Microsoft.UI.Xaml.Markup.winmd</PackagePath>
       <Modified>2020-12-02T01:52:00.000</Modified>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Telepuzik\source\repos\BleServer02\BleServer02\Properties\Default.rd.xml">
+    <AppxPackagedFile Include="C:\Users\Telepuzik\source\repos\BleServer02\BleServer\BleServer02\Properties\Default.rd.xml">
       <PackagePath>Properties\Default.rd.xml</PackagePath>
       <Modified>2024-07-25T07:47:35.580</Modified>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Telepuzik\source\repos\BleServer02\BleServer02\Assets\LockScreenLogo.scale-200.png">
+    <AppxPackagedFile Include="C:\Users\Telepuzik\source\repos\BleServer02\BleServer\BleServer02\Assets\LockScreenLogo.scale-200.png">
       <PackagePath>Assets\LockScreenLogo.scale-200.png</PackagePath>
       <Modified>2022-09-10T10:36:33.610</Modified>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Telepuzik\source\repos\BleServer02\BleServer02\Assets\SplashScreen.scale-200.png">
+    <AppxPackagedFile Include="C:\Users\Telepuzik\source\repos\BleServer02\BleServer\BleServer02\Assets\SplashScreen.scale-200.png">
       <PackagePath>Assets\SplashScreen.scale-200.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
       <Modified>2022-09-10T10:36:33.612</Modified>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Telepuzik\source\repos\BleServer02\BleServer02\Assets\Square150x150Logo.scale-200.png">
+    <AppxPackagedFile Include="C:\Users\Telepuzik\source\repos\BleServer02\BleServer\BleServer02\Assets\Square150x150Logo.scale-200.png">
       <PackagePath>Assets\Square150x150Logo.scale-200.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
       <Modified>2022-09-10T10:36:33.613</Modified>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Telepuzik\source\repos\BleServer02\BleServer02\Assets\Square44x44Logo.scale-200.png">
+    <AppxPackagedFile Include="C:\Users\Telepuzik\source\repos\BleServer02\BleServer\BleServer02\Assets\Square44x44Logo.scale-200.png">
       <PackagePath>Assets\Square44x44Logo.scale-200.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
       <Modified>2022-09-10T10:36:33.613</Modified>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Telepuzik\source\repos\BleServer02\BleServer02\Assets\Square44x44Logo.targetsize-24_altform-unplated.png">
+    <AppxPackagedFile Include="C:\Users\Telepuzik\source\repos\BleServer02\BleServer\BleServer02\Assets\Square44x44Logo.targetsize-24_altform-unplated.png">
       <PackagePath>Assets\Square44x44Logo.targetsize-24_altform-unplated.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
       <Modified>2022-09-10T10:36:33.615</Modified>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Telepuzik\source\repos\BleServer02\BleServer02\Assets\StoreLogo.png">
+    <AppxPackagedFile Include="C:\Users\Telepuzik\source\repos\BleServer02\BleServer\BleServer02\Assets\StoreLogo.png">
       <PackagePath>Assets\StoreLogo.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
       <Modified>2022-09-10T10:36:33.615</Modified>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Telepuzik\source\repos\BleServer02\BleServer02\Assets\Wide310x150Logo.scale-200.png">
+    <AppxPackagedFile Include="C:\Users\Telepuzik\source\repos\BleServer02\BleServer\BleServer02\Assets\Wide310x150Logo.scale-200.png">
       <PackagePath>Assets\Wide310x150Logo.scale-200.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
       <Modified>2022-09-10T10:36:33.616</Modified>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Telepuzik\source\repos\BleServer02\BleServer02\bin\x86\Debug\BleServer02.xr.xml">
+    <AppxPackagedFile Include="C:\Users\Telepuzik\source\repos\BleServer02\BleServer\BleServer02\bin\x86\Debug\BleServer02.xr.xml">
       <PackagePath>BleServer02.xr.xml</PackagePath>
       <Modified>2024-07-29T13:56:42.075</Modified>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Telepuzik\source\repos\BleServer02\BleServer02\bin\x86\Debug\App.xbf">
+    <AppxPackagedFile Include="C:\Users\Telepuzik\source\repos\BleServer02\BleServer\BleServer02\bin\x86\Debug\App.xbf">
       <PackagePath>App.xbf</PackagePath>
-      <Modified>2024-07-29T14:28:10.706</Modified>
+      <Modified>2024-07-31T15:58:21.406</Modified>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Telepuzik\source\repos\BleServer02\BleServer02\bin\x86\Debug\MainPage.xbf">
+    <AppxPackagedFile Include="C:\Users\Telepuzik\source\repos\BleServer02\BleServer\BleServer02\bin\x86\Debug\MainPage.xbf">
       <PackagePath>MainPage.xbf</PackagePath>
-      <Modified>2024-07-29T14:28:10.706</Modified>
+      <Modified>2024-07-31T15:58:21.407</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Program Files %28x86%29\Windows Kits\10\UnionMetadata\10.0.19041.0\Windows.winmd">
       <PackagePath>WinMetadata\Windows.winmd</PackagePath>
       <Modified>2020-12-01T23:52:06.000</Modified>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Telepuzik\source\repos\BleServer02\BleServer02\bin\x86\Debug\resources.pri">
+    <AppxPackagedFile Include="C:\Users\Telepuzik\source\repos\BleServer02\BleServer\BleServer02\bin\x86\Debug\resources.pri">
       <PackagePath>resources.pri</PackagePath>
-      <Modified>2024-07-29T14:28:11.592</Modified>
+      <Modified>2024-07-31T14:01:20.399</Modified>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Telepuzik\source\repos\BleServer02\BleServer02\bin\x86\Debug\Core\BleServer02.exe">
+    <AppxPackagedFile Include="C:\Users\Telepuzik\source\repos\BleServer02\BleServer\BleServer02\bin\x86\Debug\Core\BleServer02.exe">
       <PackagePath>BleServer02.exe</PackagePath>
-      <Modified>2024-07-29T14:28:12.308</Modified>
+      <Modified>2024-07-31T15:58:23.010</Modified>
     </AppxPackagedFile>
   </ItemGroup>
   <ItemGroup>
