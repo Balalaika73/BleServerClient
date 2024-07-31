@@ -25,6 +25,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public class BLE_Gatt_Service extends Service {
     private BluetoothGatt bluetoothGatt;
@@ -34,9 +35,6 @@ public class BLE_Gatt_Service extends Service {
     UUID CHARACTERISTIC_UUID = UUID.fromString("72563044-DB33-4692-A45D-C5212EEBABFA");
     private static final int BLOCK_SIZE = 160;
     private static final long DELAY_MS = 60;
-    private int totalBlocks;
-    private int currentBlockIndex = 0;
-    private Handler handler = new Handler();
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -78,7 +76,7 @@ public class BLE_Gatt_Service extends Service {
                 }
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 Log.i(TAG, "Отсоеденино от GATT server.");
-                sendBroadcastMessage("Service disconnected from GATT server.");
+                sendDataToActivity("Отсоединение от GATT сервера.");
             } else {
                 Log.w(TAG, "Статус соединения изменился: " + status);
             }
@@ -115,8 +113,6 @@ public class BLE_Gatt_Service extends Service {
                                 gatt.writeDescriptor(descriptor);
                             }
                         }
-                        // Если нужно, вы можете выполнить чтение значений характеристик или другие операции
-                        // Например, gatt.readCharacteristic(characteristic);
                     }
                 }
             } else {
@@ -149,15 +145,22 @@ public class BLE_Gatt_Service extends Service {
         public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
             if (characteristic.getUuid().equals(CHARACTERISTIC_UUID)) {
                 byte[] data = characteristic.getValue();
-                String dataString = new String(data, StandardCharsets.UTF_8); // Преобразование байтов в строку
+                String dataString = new String(data, StandardCharsets.UTF_8);
                 Log.i(TAG, "Received data: " + dataString);
-                sendDataToActivity(dataString); // Отправка данных в активность
+                CompletableFuture.runAsync(() -> {
+                    try {
+                        Thread.sleep(DELAY_MS);
+                    } catch (InterruptedException e) {
+                        Log.e(TAG, "Ошибка получения данных.", e);
+                    }
+                }).join();
+                sendDataToActivity(dataString);
             }
         }
 
     };
 
-    public boolean startDataTransmission(byte[] data) {
+    public boolean startDataTransmission(byte[] data) throws InterruptedException {
         Log.i(TAG, "Начата передача данных.");
         if (characteristic != null) {
             if(bluetoothGatt != null) {
@@ -171,6 +174,13 @@ public class BLE_Gatt_Service extends Service {
                 }
 
                 boolean success = bluetoothGatt.writeCharacteristic(characteristic);
+                CompletableFuture.runAsync(() -> {
+                    try {
+                        Thread.sleep(DELAY_MS);
+                    } catch (InterruptedException e) {
+                        Log.e(TAG, "Ошибка передачи данных.", e);
+                    }
+                }).join();
                 if (success) {
                     Log.i(TAG, "Data write request sent.");
                     return true;
@@ -212,11 +222,5 @@ public class BLE_Gatt_Service extends Service {
     public void onCreate() {
         super.onCreate();
         context = this;
-    }
-
-    private void sendBroadcastMessage(String message) {
-        Intent intent = new Intent("com.example.bletesttask.MESSAGE");
-        intent.putExtra("message", message);
-        sendBroadcast(intent);
     }
 }

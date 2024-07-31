@@ -39,8 +39,10 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Timer;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public class DeviceDataActivity extends AppCompatActivity {
     Button sendData;
@@ -114,11 +116,57 @@ public class DeviceDataActivity extends AppCompatActivity {
 
     }
 
-    private void sendNextBlock(byte[] data) {
-        boolean success = bleGattService.startDataTransmission(data);
+    public void sendNextBlock(byte[] data) {
+        List<byte[]> blocks = splitDataIntoBlocks(data, BLOCK_SIZE);
+        CompletableFuture<Void> previousTransmission = CompletableFuture.completedFuture(null);
+
+        for (byte[] block : blocks) {
+            previousTransmission = previousTransmission.thenCompose(v -> {
+                return CompletableFuture.supplyAsync(() -> {
+                            try {
+                                return bleGattService.startDataTransmission(block);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            return null;
+                        })
+                        .thenAccept(success -> {
+                            if (success) {
+                                Log.i(TAG, "Block sent successfully.");
+                            } else {
+                                Log.w(TAG, "Failed to send block.");
+                            }
+                        })
+                        .thenRun(() -> {
+                            try {
+                                Thread.sleep(DELAY_MS); // Задержка в миллисекундах
+                            } catch (InterruptedException e) {
+                                Log.e(TAG, "Block transmission delay interrupted.", e);
+                            }
+                        });
+            });
+        }
+        previousTransmission.join();
     }
 
-    private void startConnection(BluetoothDevice device) {     //установление соединения
+    public static List<byte[]> splitDataIntoBlocks(byte[] data, int blockSize) {
+        List<byte[]> blocks = new ArrayList<>();
+
+        int totalLength = data.length;
+        int offset = 0;
+
+        while (offset < totalLength) {
+            int length = Math.min(blockSize, totalLength - offset);
+            byte[] block = new byte[length];
+            System.arraycopy(data, offset, block, 0, length);
+            blocks.add(block);
+            offset += length;
+        }
+
+        return blocks;
+    }
+
+    private void startConnection(BluetoothDevice device) {
         if (device != null) {
             if (isBound && bleGattService != null) {
                 try {
@@ -149,7 +197,7 @@ public class DeviceDataActivity extends AppCompatActivity {
             String data = intent.getStringExtra("data");
             if (data != null) {
                 receiveData.add(data);
-                adapter.notifyDataSetChanged(); // Обновление списка
+                adapter.notifyDataSetChanged();
             }
         }
     };
@@ -162,7 +210,7 @@ public class DeviceDataActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(dataReceiver); // Отмена регистрации BroadcastReceiver
+        unregisterReceiver(dataReceiver);
     }
 
     @Override
