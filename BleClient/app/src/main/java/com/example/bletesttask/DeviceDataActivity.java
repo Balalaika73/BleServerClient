@@ -156,25 +156,20 @@ public class DeviceDataActivity extends AppCompatActivity {
         int offset = 0;
 
         while (offset < totalLength) {
-            // Определяем размер блока с учетом возможного разрыва многобайтового символа
             int length = Math.min(blockSize, totalLength - offset);
 
-            // Создаем временный блок для проверки
             byte[] tempBlock = new byte[length];
             System.arraycopy(data, offset, tempBlock, 0, length);
             int a = isLastBytePartOfSymbol(tempBlock);
 
-            // Корректируем размер блока, если нужно
             if (a > 0 && length > a) {
                 length -= a;
             }
 
-            // Создаем окончательный блок с правильным размером
             byte[] block = new byte[length];
             System.arraycopy(data, offset, block, 0, length);
             blocks.add(block);
 
-            // Переход к следующему блоку
             offset += length;
         }
 
@@ -183,43 +178,31 @@ public class DeviceDataActivity extends AppCompatActivity {
 
 
     public static int isLastBytePartOfSymbol(byte[] bytes) {
-        // Проверка, что массив не пустой
         if (bytes.length == 0) {
             return 0;
         }
 
-        // Последний байт в блоке
         byte lastByte = bytes[bytes.length - 1];
 
-        // Если последний байт имеет старший бит, то это может быть продолжение многобайтового символа
         if ((lastByte & 0x80) == 0) {
-            // 1 байт: ASCII символ, не является частью многобайтового символа
             return 0;
         } else if ((lastByte & 0xC0) == 0x80) {
-            // Последний байт - это продолжение многобайтового символа
             for (int i = bytes.length - 2; i >= 0; i--) {
                 byte b = bytes[i];
                 if ((b & 0x80) == 0) {
-                    // 1 байт: ASCII символ
                     return 0;
                 } else if ((b & 0xC0) == 0x80) {
-                    // Продолжение многобайтового символа
                     continue;
                 } else if ((b & 0xE0) == 0xC0) {
-                    // Начало 2-байтового символа
                     return 2;
                 } else if ((b & 0xF0) == 0xE0) {
-                    // Начало 3-байтового символа
                     return 3;
                 } else if ((b & 0xF8) == 0xF0) {
-                    // Начало 4-байтового символа
                     return 4;
                 }
             }
-            // Если не нашли начала символа, значит, последний байт некорректен
             return 0;
         } else {
-            // Это начало нового символа
             return 1;
         }
     }
