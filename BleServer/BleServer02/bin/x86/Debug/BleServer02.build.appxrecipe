@@ -79,12 +79,6 @@
     <AppxPackagedFile Include="C:\Users\Telepuzik\source\repos\BleServer02\BleServer\BleServer02\bin\x86\Debug\BleServer02.xr.xml">
       <PackagePath>BleServer02.xr.xml</PackagePath>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Telepuzik\source\repos\BleServer02\BleServer\BleServer02\bin\x86\Debug\App.xbf">
-      <PackagePath>App.xbf</PackagePath>
-    </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Telepuzik\source\repos\BleServer02\BleServer\BleServer02\bin\x86\Debug\MainPage.xbf">
-      <PackagePath>MainPage.xbf</PackagePath>
-    </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Program Files %28x86%29\Windows Kits\10\UnionMetadata\10.0.19041.0\Windows.winmd">
       <PackagePath>WinMetadata\Windows.winmd</PackagePath>
     </AppxPackagedFile>

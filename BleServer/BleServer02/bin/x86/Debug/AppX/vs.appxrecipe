@@ -30,13 +30,13 @@
     <AppXManifest Include="C:\Users\Telepuzik\source\repos\BleServer02\BleServer\BleServer02\bin\x86\Debug\Core\AppxManifest.xml">
       <PackagePath>AppxManifest.xml</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2024-07-31T15:58:23.025</Modified>
+      <Modified>2024-08-08T13:55:34.348</Modified>
     </AppXManifest>
   </ItemGroup>
   <ItemGroup>
     <AppxPackagedFile Include="C:\Users\Telepuzik\source\repos\BleServer02\BleServer\BleServer02\bin\x86\Debug\BleServer02.exe">
       <PackagePath>entrypoint\BleServer02.exe</PackagePath>
-      <Modified>2024-07-31T15:58:21.577</Modified>
+      <Modified>2024-08-08T13:55:28.207</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\Telepuzik\.nuget\packages\microsoft.bcl.asyncinterfaces\8.0.0\lib\netstandard2.0\Microsoft.Bcl.AsyncInterfaces.dll">
       <PackagePath>Microsoft.Bcl.AsyncInterfaces.dll</PackagePath>
@@ -104,25 +104,17 @@
       <PackagePath>BleServer02.xr.xml</PackagePath>
       <Modified>2024-07-29T13:56:42.075</Modified>
     </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Telepuzik\source\repos\BleServer02\BleServer\BleServer02\bin\x86\Debug\App.xbf">
-      <PackagePath>App.xbf</PackagePath>
-      <Modified>2024-07-31T15:58:21.406</Modified>
-    </AppxPackagedFile>
-    <AppxPackagedFile Include="C:\Users\Telepuzik\source\repos\BleServer02\BleServer\BleServer02\bin\x86\Debug\MainPage.xbf">
-      <PackagePath>MainPage.xbf</PackagePath>
-      <Modified>2024-07-31T15:58:21.407</Modified>
-    </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Program Files %28x86%29\Windows Kits\10\UnionMetadata\10.0.19041.0\Windows.winmd">
       <PackagePath>WinMetadata\Windows.winmd</PackagePath>
       <Modified>2020-12-01T23:52:06.000</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\Telepuzik\source\repos\BleServer02\BleServer\BleServer02\bin\x86\Debug\resources.pri">
       <PackagePath>resources.pri</PackagePath>
-      <Modified>2024-07-31T14:01:20.399</Modified>
+      <Modified>2024-08-08T13:55:30.484</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\Telepuzik\source\repos\BleServer02\BleServer\BleServer02\bin\x86\Debug\Core\BleServer02.exe">
       <PackagePath>BleServer02.exe</PackagePath>
-      <Modified>2024-07-31T15:58:23.010</Modified>
+      <Modified>2024-08-08T13:55:34.265</Modified>
     </AppxPackagedFile>
   </ItemGroup>
   <ItemGroup>
