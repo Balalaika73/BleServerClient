@@ -13,16 +13,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Binder;
-import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 
-import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -31,9 +28,7 @@ public class BLE_Gatt_Service extends Service {
     private BluetoothGatt bluetoothGatt;
     private static final String TAG = "GATService";
     private BluetoothGattCharacteristic characteristic;
-    private Context context;
-    UUID CHARACTERISTIC_UUID = UUID.fromString("72563044-DB33-4692-A45D-C5212EEBABFA");
-    private static final int BLOCK_SIZE = 160;
+    private static final UUID CHARACTERISTIC_UUID = UUID.fromString("72563044-DB33-4692-A45D-C5212EEBABFA");
     private static final long DELAY_MS = 60;
 
     @Override
@@ -48,10 +43,7 @@ public class BLE_Gatt_Service extends Service {
     }
 
     public void connectToDevice(BluetoothDevice device) {
-        if (device != null) {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                return;
-            }
+        if (device != null && ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED) {
             bluetoothGatt = device.connectGatt(this, false, gattCallback);
         }
     }
@@ -60,57 +52,49 @@ public class BLE_Gatt_Service extends Service {
         if (bluetoothGatt == null) return null;
 
         BluetoothGattService service = bluetoothGatt.getService(serviceUUID);
-        if (service != null) {
-            return service.getCharacteristic(characteristicUUID);
-        }
-        return null;
+        return service != null ? service.getCharacteristic(characteristicUUID) : null;
     }
 
     private final BluetoothGattCallback gattCallback = new BluetoothGattCallback() {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+            Log.i(TAG, "onConnectionStateChange: newState=" + newState + ", status=" + status);
             if (newState == BluetoothProfile.STATE_CONNECTED) {
-                Log.i(TAG, "Соеденено с GATT server.");
+                Log.i(TAG, "Connected to GATT server.");
                 if (ActivityCompat.checkSelfPermission(BLE_Gatt_Service.this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED) {
-                    Log.i(TAG, "Attempting to start service discovery: " + bluetoothGatt.discoverServices());
+                    bluetoothGatt.discoverServices();
                 }
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                Log.i(TAG, "Отсоеденино от GATT server.");
-                sendDataToActivity("Отсоединение от GATT сервера.");
+                Log.i(TAG, "Disconnected from GATT server.");
+                sendDataToActivity("Disconnected from GATT server.");
+                sendBroadcast(new Intent("com.example.bletestask.DISCONNECTED"));
             } else {
-                Log.w(TAG, "Статус соединения изменился: " + status);
+                Log.w(TAG, "Connection state changed: " + status);
             }
         }
 
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                List<BluetoothGattService> services = gatt.getServices();
-                for (BluetoothGattService service : services) {
-                    Log.i("BluetoothGattCallback", "Service UUID: " + service.getUuid().toString());
+                for (BluetoothGattService service : gatt.getServices()) {
+                    Log.i(TAG, "Service UUID: " + service.getUuid().toString());
 
-                    // Перебор всех характеристик для текущей службы
-                    List<BluetoothGattCharacteristic> characteristics = service.getCharacteristics();
-                    for (BluetoothGattCharacteristic charac  : characteristics) {
-                        Log.i("BluetoothGattCallback", "Characteristic UUID: " + charac.getUuid().toString());
-                        if (charac.getUuid().equals(UUID.fromString(CHARACTERISTIC_UUID.toString()))) {
+                    for (BluetoothGattCharacteristic charac : service.getCharacteristics()) {
+                        Log.i(TAG, "Characteristic UUID: " + charac.getUuid().toString());
+
+                        if (charac.getUuid().equals(CHARACTERISTIC_UUID)) {
                             characteristic = charac;
                         }
-                        // Проверка, поддерживает ли характеристика уведомления
-                        int properties = charac.getProperties();
-                        if ((properties & BluetoothGattCharacteristic.PROPERTY_NOTIFY) != 0) {
-                            // Подписка на уведомления для этой характеристики
-                            if (ActivityCompat.checkSelfPermission(BLE_Gatt_Service.this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                                return;
-                            }
-                            gatt.setCharacteristicNotification(charac, true);
 
-                            // Найти дескриптор, который управляет уведомлениями
-                            BluetoothGattDescriptor descriptor = charac.getDescriptor(
-                                    UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")); // Client Characteristic Configuration descriptor UUID
-                            if (descriptor != null) {
-                                descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-                                gatt.writeDescriptor(descriptor);
+                        if ((charac.getProperties() & BluetoothGattCharacteristic.PROPERTY_NOTIFY) != 0) {
+                            if (ActivityCompat.checkSelfPermission(BLE_Gatt_Service.this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED) {
+                                gatt.setCharacteristicNotification(charac, true);
+                                BluetoothGattDescriptor descriptor = charac.getDescriptor(
+                                        UUID.fromString("00002902-0000-1000-8000-00805f9b34fb"));
+                                if (descriptor != null) {
+                                    descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+                                    gatt.writeDescriptor(descriptor);
+                                }
                             }
                         }
                     }
@@ -125,11 +109,6 @@ public class BLE_Gatt_Service extends Service {
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 Log.i(TAG, "Characteristic read: " + characteristic.getValue());
             }
-            if ((characteristic.getProperties()
-                    & BluetoothGattCharacteristic.PROPERTY_READ) == 0) {
-                return;
-            }
-
         }
 
         @Override
@@ -144,41 +123,31 @@ public class BLE_Gatt_Service extends Service {
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
             if (characteristic.getUuid().equals(CHARACTERISTIC_UUID)) {
-                byte[] data = characteristic.getValue();
-                String dataString = new String(data, StandardCharsets.UTF_8);
+                String dataString = new String(characteristic.getValue(), StandardCharsets.UTF_8);
                 Log.i(TAG, "Received data: " + dataString);
                 CompletableFuture.runAsync(() -> {
                     try {
                         Thread.sleep(DELAY_MS);
                     } catch (InterruptedException e) {
-                        Log.e(TAG, "Ошибка получения данных.", e);
+                        Log.e(TAG, "Data retrieval error.", e);
                     }
                 }).join();
                 sendDataToActivity(dataString);
             }
         }
-
     };
 
     public boolean startDataTransmission(byte[] data) throws InterruptedException {
-        Log.i(TAG, "Начата передача данных.");
-        if (characteristic != null) {
-            if(bluetoothGatt != null) {
-                Log.i(TAG, "Все ок.");
-
-                characteristic.setValue(data);
-
-                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                    Log.w(TAG, "Bluetooth connect permission not granted.");
-                    return false;
-                }
-
+        Log.i(TAG, "Starting data transmission.");
+        if (characteristic != null && bluetoothGatt != null) {
+            characteristic.setValue(data);
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED) {
                 boolean success = bluetoothGatt.writeCharacteristic(characteristic);
                 CompletableFuture.runAsync(() -> {
                     try {
                         Thread.sleep(DELAY_MS);
                     } catch (InterruptedException e) {
-                        Log.e(TAG, "Ошибка передачи данных.", e);
+                        Log.e(TAG, "Data transmission error.", e);
                     }
                 }).join();
                 if (success) {
@@ -186,21 +155,18 @@ public class BLE_Gatt_Service extends Service {
                     return true;
                 } else {
                     Log.w(TAG, "Data write request failed.");
-                    return false;
                 }
-            }
-            else {
-                Log.e(TAG, "BluetoothGatt not initialized.");
-                return false;
+            } else {
+                Log.w(TAG, "Bluetooth connect permission not granted.");
             }
         } else {
-            Log.e(TAG, " characteristic not initialized.");
-            return false;
+            Log.e(TAG, "BluetoothGatt or characteristic not initialized.");
         }
+        return false;
     }
 
     private void sendDataToActivity(String data) {
-        Intent intent = new Intent("com.example.bletesttask.DATA");
+        Intent intent = new Intent("com.example.bletestask.DATA");
         intent.putExtra("data", data);
         sendBroadcast(intent);
     }
@@ -209,18 +175,18 @@ public class BLE_Gatt_Service extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Log.i(TAG, "Service destroyed.");
         if (bluetoothGatt != null) {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                return;
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED) {
+                bluetoothGatt.close();
+                bluetoothGatt = null;
+                Log.i(TAG, "BluetoothGatt connection closed.");
             }
-            bluetoothGatt.close();
-            bluetoothGatt = null;
         }
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
-        context = this;
     }
 }

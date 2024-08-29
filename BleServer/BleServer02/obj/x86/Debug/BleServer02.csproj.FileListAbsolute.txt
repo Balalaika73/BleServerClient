@@ -104,7 +104,3 @@ C:\Users\Telepuzik\source\repos\BleServer02\BleServer\BleServer02\obj\x86\Debug\
 C:\Users\Telepuzik\source\repos\BleServer02\BleServer\BleServer02\obj\x86\Debug\resources.en-us.resfiles.intermediate
 C:\Users\Telepuzik\source\repos\BleServer02\BleServer\BleServer02\obj\x86\Debug\ProjectArchitectures.txt
 C:\Users\Telepuzik\source\repos\BleServer02\BleServer\BleServer02\obj\x86\Debug\.winmd_cache\$Microsoft.UI.Xaml.Markup.winmd_637424707200000000.json
-C:\Users\Telepuzik\source\repos\BleServer02\BleServer\BleServer02\obj\x86\Debug\package.map.txt
-C:\Users\Telepuzik\source\repos\BleServer02\BleServer\BleServer02\obj\x86\Debug\_pkginfo.txt
-C:\Users\Telepuzik\source\repos\BleServer02\BleServer\BleServer02\obj\x86\Debug\Symbols\BleServer02.pdb
-C:\Users\Telepuzik\source\repos\BleServer02\BleServer\BleServer02\obj\x86\Debug\_installerinfo.log

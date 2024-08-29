@@ -10,6 +10,7 @@ import androidx.core.app.ActivityCompat;
 
 public class BLE_Device {
     private static final int PERMISSION_REQUEST_CODE = 1001;
+
     private BluetoothDevice bluetoothDevice;
     private int rssi;
     private Context context;
@@ -27,14 +28,10 @@ public class BLE_Device {
         return bluetoothDevice.getAddress();
     }
 
-
     public String getName() {
-        if (activity != null) {
-            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                // Если разрешение не предоставлено, запросить его
-                ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, PERMISSION_REQUEST_CODE);
-                return null;
-            }
+        if (activity != null && ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, PERMISSION_REQUEST_CODE);
+            return null;
         }
         return bluetoothDevice.getName();
     }

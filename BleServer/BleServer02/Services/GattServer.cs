@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
-using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Devices.Bluetooth;
+using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Storage.Streams;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Reflection.PortableExecutable;
 
 namespace BleServer02.Services
 {
@@ -15,13 +12,12 @@ namespace BleServer02.Services
         private GattServiceProvider _gattServiceProvider;
         private readonly ILogger _logger;
         private readonly Guid _serviceId;
-        private Dictionary<Guid, GattLocalCharacteristic> _characteristics = new Dictionary<Guid, GattLocalCharacteristic>();
+        private readonly Dictionary<Guid, GattLocalCharacteristic> _characteristics = new Dictionary<Guid, GattLocalCharacteristic>();
 
-        public delegate void GattChararteristicHandler(object myObject, CharacteristicEventArgs myArgs);
+        public event Action<object, CharacteristicEventArgs> OnCharacteristicWrite;
 
-        public event GattChararteristicHandler OnCharacteristicWrite;
-        private static int DELAY_MS = 60;
-        private static int BLOCK_SIZE = 160;
+        private const int DELAY_MS = 60;
+        private const int BLOCK_SIZE = 160;
 
         public GattServer(Guid serviceId, ILogger logger)
         {
@@ -29,43 +25,34 @@ namespace BleServer02.Services
             _serviceId = serviceId;
         }
 
-        private async Task LogConnectionStatus(string status)
-        {
-            await _logger.LogMessageAsync(status);
-        }
-
         public async Task Initialize()
         {
-            var cellaGatService = await GattServiceProvider.CreateAsync(_serviceId);
+            var serviceResult = await GattServiceProvider.CreateAsync(_serviceId);
 
-            if (cellaGatService.Error == BluetoothError.RadioNotAvailable)
+            if (serviceResult.Error == BluetoothError.RadioNotAvailable)
             {
                 throw new Exception("BLE not enabled");
             }
 
-            if (cellaGatService.Error == BluetoothError.Success)
+            if (serviceResult.Error == BluetoothError.Success)
             {
-                _gattServiceProvider = cellaGatService.ServiceProvider;
-
-                // Добавляем характеристику
+                _gattServiceProvider = serviceResult.ServiceProvider;
                 await AddDataExchangeCharacteristicAsync(new Guid("72563044-DB33-4692-A45D-C5212EEBABFA"), "Data Exchange");
-
-                // Запускаем сервер
                 Start();
             }
 
             _gattServiceProvider.AdvertisementStatusChanged += async (sender, args) =>
             {
-                await _logger.LogMessageAsync(
-                    sender.AdvertisementStatus == GattServiceProviderAdvertisementStatus.Started ?
-                    "GATT сервер включен." :
-                    "GATT сервер выключен.");
+                var statusMessage = sender.AdvertisementStatus == GattServiceProviderAdvertisementStatus.Started
+                    ? "GATT сервер включен."
+                    : "GATT сервер выключен.";
+                await _logger.LogMessageAsync(statusMessage);
             };
         }
 
         public async Task<bool> AddDataExchangeCharacteristicAsync(Guid characteristicId, string userDescription)
         {
-            await _logger.LogMessageAsync($"Adding data exchange characteristic: description: {userDescription}, guid: {characteristicId}");
+            await _logger.LogMessageAsync($"Adding characteristic: {userDescription}, guid: {characteristicId}");
 
             var characteristicParameters = new GattLocalCharacteristicParameters
             {
@@ -78,7 +65,7 @@ namespace BleServer02.Services
             var characteristicResult = await _gattServiceProvider.Service.CreateCharacteristicAsync(characteristicId, characteristicParameters);
             if (characteristicResult.Error != BluetoothError.Success)
             {
-                await _logger.LogMessageAsync("Adding data exchange characteristic failed");
+                await _logger.LogMessageAsync("Failed to add characteristic.");
                 return false;
             }
 
@@ -90,18 +77,14 @@ namespace BleServer02.Services
                 using (args.GetDeferral())
                 {
                     var request = await args.GetRequestAsync();
-                    if (request == null)
-                    {
-                        return;
-                    }
+                    if (request == null) return;
 
-                    //задержка чтения блоков
                     await Task.Delay(DELAY_MS);
 
                     using (var dataReader = DataReader.FromBuffer(request.Value))
                     {
                         var characteristicValue = dataReader.ReadString(request.Value.Length);
-                        OnCharacteristicWrite?.Invoke(null, new CharacteristicEventArgs(localCharacteristic.Uuid, characteristicValue));
+                        OnCharacteristicWrite?.Invoke(this, new CharacteristicEventArgs(localCharacteristic.Uuid, characteristicValue));
                     }
 
                     if (request.Option == GattWriteOption.WriteWithResponse)
@@ -113,13 +96,15 @@ namespace BleServer02.Services
 
             localCharacteristic.ReadRequested += async (sender, args) =>
             {
-                var deferral = args.GetDeferral();
-                var request = await args.GetRequestAsync();
-                var writer = new DataWriter();
-                writer.WriteString("Data to send to client");
+                using (args.GetDeferral())
+                {
+                    var request = await args.GetRequestAsync();
+                    var writer = new DataWriter();
+                    writer.WriteString("Data to send to client");
+                    request.RespondWithValue(writer.DetachBuffer());
+                }
+
                 await _logger.LogMessageAsync("Read request received");
-                request.RespondWithValue(writer.DetachBuffer());
-                deferral.Complete();
             };
 
             return true;
@@ -141,53 +126,58 @@ namespace BleServer02.Services
 
         public async Task<bool> SendNotificationAsync(Guid characteristicId, byte[] data)
         {
-            if (_characteristics.TryGetValue(characteristicId, out var characteristic))
-            {
-                //Разбиение на блоки
-                var blocks = SplitDataIntoBlocks(data, BLOCK_SIZE);
-                bool success = true;
-                foreach (var block in blocks)
-                {
-                    var writer = new DataWriter();
-                    writer.WriteBytes(block);
-                    var buffer = writer.DetachBuffer();
-
-                    var notificationResults = await characteristic.NotifyValueAsync(buffer);
-
-                    foreach (var result in notificationResults)
-                    {
-                        if (result.Status != GattCommunicationStatus.Success)
-                        {
-                            success = false;
-                            await _logger.LogMessageAsync($"Ошибка отправки данных: {result.Status}");
-                        }
-                    }
-
-                    // Задержка между отправками блоков
-                    await Task.Delay(DELAY_MS);
-                }
-                
-                return success;
-            }
-            else
+            if (!_characteristics.TryGetValue(characteristicId, out var characteristic))
             {
                 await _logger.LogMessageAsync("Characteristic not found.");
                 return false;
             }
+
+            var blocks = SplitDataIntoBlocks(data, BLOCK_SIZE);
+            var success = true;
+
+            foreach (var block in blocks)
+            {
+                var writer = new DataWriter();
+                writer.WriteBytes(block);
+                var buffer = writer.DetachBuffer();
+
+                var notificationResults = await characteristic.NotifyValueAsync(buffer);
+
+                foreach (var result in notificationResults)
+                {
+                    if (result.Status != GattCommunicationStatus.Success)
+                    {
+                        success = false;
+                        await _logger.LogMessageAsync($"Error sending data: {result.Status}");
+                    }
+                }
+
+                await Task.Delay(DELAY_MS);
+            }
+
+            return success;
         }
 
         private static List<byte[]> SplitDataIntoBlocks(byte[] data, int blockSize)
         {
             var blocks = new List<byte[]>();
-
-            int totalLength = data.Length;
-            int offset = 0;
+            var totalLength = data.Length;
+            var offset = 0;
 
             while (offset < totalLength)
             {
-                int length = Math.Min(blockSize, totalLength - offset);
-                byte[] block = new byte[length];
+                var length = Math.Min(blockSize, totalLength - offset);
+                var block = new byte[length];
                 Array.Copy(data, offset, block, 0, length);
+
+                var excessBytes = isLastBytePartOfSymbol(block);
+                if (excessBytes > 0 && length > excessBytes)
+                {
+                    length -= excessBytes;
+                    block = new byte[length];
+                    Array.Copy(data, offset, block, 0, length);
+                }
+
                 blocks.Add(block);
                 offset += length;
             }
@@ -195,6 +185,29 @@ namespace BleServer02.Services
             return blocks;
         }
 
+        private static int isLastBytePartOfSymbol(byte[] bytes)
+        {
+            if (bytes.Length == 0) return 0;
+
+            var lastByte = bytes[bytes.Length - 1];
+            if ((lastByte & 0x80) == 0) return 0;
+
+            if ((lastByte & 0xC0) == 0x80)
+            {
+                for (int i = bytes.Length - 2; i >= 0; i--)
+                {
+                    var b = bytes[i];
+                    if ((b & 0x80) == 0) return 0;
+                    if ((b & 0xC0) == 0x80) continue;
+
+                    if ((b & 0xE0) == 0xC0) return 2;
+                    if ((b & 0xF0) == 0xE0) return 3;
+                    if ((b & 0xF8) == 0xF0) return 4;
+                }
+            }
+
+            return 1;
+        }
 
         public async void Stop()
         {

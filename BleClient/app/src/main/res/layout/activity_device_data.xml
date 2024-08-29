@@ -13,12 +13,19 @@
         android:layout_height="35dp"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <TextView
+        android:id="@+id/stDev"
+        android:textSize="25dp"
+        android:layout_width="match_parent"
+        android:layout_height="35dp"
+        app:layout_constraintTop_toBottomOf="@+id/nameDev" />
+
     <ListView
         android:id="@+id/getData"
         android:layout_width="match_parent"
         android:layout_height="150dp"
         android:layout_marginTop="25dp"
-        app:layout_constraintTop_toBottomOf="@+id/nameDev"
+        app:layout_constraintTop_toBottomOf="@+id/stDev"
         tools:layout_editor_absoluteX="0dp"/>
 
     <EditText

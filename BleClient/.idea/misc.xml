@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/Telepuzik/AndroidStudioProjects/BleTestTask2/BleClient/app/src/main/res/layout/activity_device_data.xml" value="0.1" />
         <entry key="..\:/Users/Telepuzik/AndroidStudioProjects/BleTestTask2/app/src/main/res/drawable/ic_baseline_bluetooth_24.xml" value="0.132" />
         <entry key="..\:/Users/Telepuzik/AndroidStudioProjects/BleTestTask2/app/src/main/res/layout/activity_device_data.xml" value="0.22" />
         <entry key="..\:/Users/Telepuzik/AndroidStudioProjects/BleTestTask2/app/src/main/res/layout/activity_main.xml" value="0.22" />
